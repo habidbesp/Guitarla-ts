@@ -1,4 +1,5 @@
 import { db } from "../data/db";
+import { initialCart, MAX_ITEMS, MIN_ITEMS } from "../helpers";
 import { CartItem, Guitar } from "../types";
 
 export type CartActions =
@@ -15,15 +16,13 @@ export type CartState = {
 
 export const initialState: CartState = {
   data: db,
-  cart: [],
+  cart: initialCart(),
 };
 
 export const cartReducer = (
   state: CartState = initialState,
   actions: CartActions
 ) => {
-  //   const MIN_ITEMS = 1;
-  const MAX_ITEMS = 5;
   let updatedCart: CartItem[] = [];
   switch (actions.type) {
     case "add-to-cart":
@@ -60,8 +59,18 @@ export const cartReducer = (
       };
 
     case "decrease-quantity":
+      updatedCart = state.cart.map((item) =>
+        item.id === actions.payload.id && item.quantity > MIN_ITEMS
+          ? {
+              ...item,
+              quantity: item.quantity - 1,
+            }
+          : item
+      );
+
       return {
         ...state,
+        cart: updatedCart,
       };
 
     case "increase-quantity":
@@ -79,6 +88,7 @@ export const cartReducer = (
     case "clear-cart":
       return {
         ...state,
+        cart: updatedCart,
       };
 
     default:
