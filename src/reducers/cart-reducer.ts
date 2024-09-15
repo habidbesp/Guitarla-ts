@@ -65,8 +65,15 @@ export const cartReducer = (
       };
 
     case "increase-quantity":
+      updatedCart = state.cart.map((item) =>
+        item.id === actions.payload.id && item.quantity < MAX_ITEMS
+          ? { ...item, quantity: item.quantity + 1 }
+          : item
+      );
+
       return {
         ...state,
+        cart: updatedCart,
       };
 
     case "clear-cart":
